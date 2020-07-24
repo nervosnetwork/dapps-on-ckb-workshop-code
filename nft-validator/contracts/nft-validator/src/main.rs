@@ -9,6 +9,7 @@ use core::result::Result;
 
 // Import heap related library from `alloc`
 // https://doc.rust-lang.org/alloc/index.html
+use alloc::collections::btree_set::BTreeSet;
 
 // Import CKB syscalls and structures
 // https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html
@@ -18,6 +19,7 @@ use ckb_std::{
     default_alloc, entry,
     error::SysError,
     high_level::{load_cell_lock_hash, load_script, QueryIter},
+    syscalls::load_cell_data,
 };
 
 entry!(entry);
@@ -68,6 +70,25 @@ fn main() -> Result<(), Error> {
 
     let mut input_lock_hashes = QueryIter::new(load_cell_lock_hash, Source::Input);
     let _governance_mode = input_lock_hashes.any(|lock_hash| lock_hash == governance_lock_hash);
+
+    // To detect if an NFT is newly generated, we will need to first gather
+    // NFTs in input cells.
+    let nft_data_loader = |index, source| {
+        let mut buf = [0u8; 32];
+        match load_cell_data(&mut buf[..], 0, index, source) {
+            Ok(length) => {
+                if length < 32 {
+                    Err(SysError::Encoding)
+                } else {
+                    Ok(buf)
+                }
+            }
+            Err(SysError::LengthNotEnough(_)) => Ok(buf),
+            Err(err) => Err(err),
+        }
+    };
+    let _consumed_nfts: BTreeSet<[u8; 32]> =
+        QueryIter::new(nft_data_loader, Source::GroupInput).collect();
 
     Ok(())
 }
