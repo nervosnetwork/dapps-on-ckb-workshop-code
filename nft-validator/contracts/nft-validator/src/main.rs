@@ -9,7 +9,7 @@ use core::result::Result;
 
 // Import heap related library from `alloc`
 // https://doc.rust-lang.org/alloc/index.html
-use alloc::collections::btree_set::BTreeSet;
+use alloc::{collections::btree_set::BTreeSet, vec::Vec};
 
 // Import CKB syscalls and structures
 // https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html
@@ -18,7 +18,9 @@ use ckb_std::{
     ckb_types::{bytes::Bytes, prelude::*},
     default_alloc, entry,
     error::SysError,
-    high_level::{load_cell_lock_hash, load_script, QueryIter},
+    high_level::{
+        load_cell_lock_hash, load_cell_type_hash, load_script, load_script_hash, QueryIter,
+    },
     syscalls::load_cell_data,
 };
 
@@ -89,6 +91,30 @@ fn main() -> Result<(), Error> {
     };
     let _consumed_nfts: BTreeSet<[u8; 32]> =
         QueryIter::new(nft_data_loader, Source::GroupInput).collect();
+
+    // In NFT generation, we will need to calculate a hash that includes the output
+    // index of the NFT cells. Let's first loop through all output cells to find
+    // the indices for all NFTs of the current type.
+    let script_hash = load_script_hash()?;
+    let _output_nft_indices: Vec<usize> = QueryIter::new(
+        |index, source| match load_cell_type_hash(index, source) {
+            Ok(hash) => Ok((Some(hash), index)),
+            Err(SysError::ItemMissing) => Ok((None, index)),
+            Err(err) => Err(err),
+        },
+        Source::Output,
+    )
+    .filter_map(|(current_script_hash, index)| {
+        if current_script_hash
+            .map(|s| s == script_hash)
+            .unwrap_or(false)
+        {
+            Some(index)
+        } else {
+            None
+        }
+    })
+    .collect();
 
     Ok(())
 }
