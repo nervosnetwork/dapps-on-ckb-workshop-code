@@ -9,17 +9,15 @@ use core::result::Result;
 
 // Import heap related library from `alloc`
 // https://doc.rust-lang.org/alloc/index.html
-use alloc::{vec, vec::Vec};
 
 // Import CKB syscalls and structures
 // https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html
 use ckb_std::{
-    entry,
-    default_alloc,
-    debug,
-    high_level::{load_script, load_tx_hash},
-    error::SysError,
+    ckb_constants::Source,
     ckb_types::{bytes::Bytes, prelude::*},
+    default_alloc, entry,
+    error::SysError,
+    high_level::{load_cell_lock_hash, load_script, QueryIter},
 };
 
 entry!(entry);
@@ -42,6 +40,7 @@ enum Error {
     LengthNotEnough,
     Encoding,
     // Add customized errors here...
+    InvalidArgument,
 }
 
 impl From<SysError> for Error {
@@ -58,16 +57,17 @@ impl From<SysError> for Error {
 }
 
 fn main() -> Result<(), Error> {
-    // remove below examples and write your code here
-
+    // We will need to extract governance lock from current running script
     let script = load_script()?;
     let args: Bytes = script.args().unpack();
-    debug!("script args is {:?}", args);
+    if args.len() < 32 {
+        return Err(Error::InvalidArgument);
+    }
+    let mut governance_lock_hash = [0u8; 32];
+    governance_lock_hash.copy_from_slice(&args[0..32]);
 
-    let tx_hash = load_tx_hash()?;
-    debug!("tx hash is {:?}", tx_hash);
-
-    let _buf: Vec<_> = vec![0u8; 32];
+    let mut input_lock_hashes = QueryIter::new(load_cell_lock_hash, Source::Input);
+    let _governance_mode = input_lock_hashes.any(|lock_hash| lock_hash == governance_lock_hash);
 
     Ok(())
 }
