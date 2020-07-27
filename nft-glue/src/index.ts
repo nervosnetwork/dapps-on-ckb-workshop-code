@@ -6,6 +6,7 @@ import {
   HexString,
   Hash,
   Address,
+  Cell,
   CellDep,
   Script,
   core,
@@ -179,4 +180,23 @@ export async function signAndSendTransactionSkeleton(
   const rpc = new RPC(CKB_RPC);
   const hash = await rpc.send_transaction(tx);
   return hash;
+}
+
+// List all current live NFT cells
+export async function listNftTokens(
+  governanceLock: Script
+): Promise<Array<Cell>> {
+  // NFT cells can be seen as live cells with the requested NFT type script.
+  const collector = INDEXER.collector({
+    type: buildNftTypeScript(governanceLock),
+    data: "any",
+  });
+  const results = [];
+  // For simplicity, we are gathering all cells in a single array. Note this might
+  // be slow in case the number of cells grows quite big. You might want to use
+  // a stream based solution to fetch only cells you need from the async iterator.
+  for await (const cell of collector.collect()) {
+    results.push(cell);
+  }
+  return results;
 }
