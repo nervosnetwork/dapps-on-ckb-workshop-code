@@ -1,12 +1,22 @@
 import { env } from "process";
 
-import { normalizers } from "ckb-js-toolkit";
-import { Address, CellDep, Script, core, utils } from "@ckb-lumos/base";
+import { ecdsaSign } from "secp256k1";
+import { Reader, RPC, normalizers } from "ckb-js-toolkit";
+import {
+  HexString,
+  Hash,
+  Address,
+  CellDep,
+  Script,
+  core,
+  utils,
+} from "@ckb-lumos/base";
 const { CKBHasher } = utils;
 import { common } from "@ckb-lumos/common-scripts";
 import { getConfig, initializeConfig } from "@ckb-lumos/config-manager";
 import {
   parseAddress,
+  sealTransaction,
   TransactionSkeletonType,
   TransactionSkeleton,
 } from "@ckb-lumos/helpers";
@@ -142,4 +152,31 @@ export async function generateNftToken(
   // Finally, let's generate messages that are required in transaction signing phase:
   skeleton = common.prepareSigningEntries(skeleton, { config: CONFIG });
   return skeleton;
+}
+
+// Sign the prepared transaction skeleton, then send it to CKB. Note this is separate
+// from lumos related functions, since we believe lumos should not manage private keys
+// unless absolutely requested. Developers might have their existing services that handle
+// private keys.
+export async function signAndSendTransactionSkeleton(
+  skeleton: TransactionSkeletonType,
+  privateKey: HexString
+): Promise<Hash> {
+  const signatures = skeleton
+    .get("signingEntries")
+    .map(({ message }) => {
+      const o = ecdsaSign(
+        new Uint8Array(new Reader(message).toArrayBuffer()),
+        new Uint8Array(new Reader(privateKey).toArrayBuffer())
+      );
+      const signature = new Uint8Array(65);
+      signature.set(o.signature, 0);
+      signature.set([o.recid], 64);
+      return new Reader(signature.buffer).serializeJson();
+    })
+    .toArray();
+  const tx = sealTransaction(skeleton, signatures);
+  const rpc = new RPC(CKB_RPC);
+  const hash = await rpc.send_transaction(tx);
+  return hash;
 }
