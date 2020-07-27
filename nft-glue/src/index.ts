@@ -8,6 +8,7 @@ import {
   Address,
   Cell,
   CellDep,
+  OutPoint,
   Script,
   core,
   utils,
@@ -17,6 +18,7 @@ import { common } from "@ckb-lumos/common-scripts";
 import { getConfig, initializeConfig } from "@ckb-lumos/config-manager";
 import {
   parseAddress,
+  generateAddress,
   sealTransaction,
   TransactionSkeletonType,
   TransactionSkeleton,
@@ -199,4 +201,57 @@ export async function listNftTokens(
     results.push(cell);
   }
   return results;
+}
+
+// Transfer NFT token from one user to another. Note that for simplicity, the original
+// token sender will pay for the transaction fee. This means the token sender must
+// have spare CKB capacities in addition to the NFT token.
+export async function transferNftToken(
+  nftCell: Cell,
+  toAddress: Address
+): Promise<TransactionSkeletonType> {
+  let skeleton = TransactionSkeleton({ cellProvider: INDEXER });
+  // Insert input and output cell for the specified NFT.
+  skeleton = skeleton
+    .update("inputs", (inputs) => {
+      return inputs.push(nftCell);
+    })
+    .update("outputs", (outputs) => {
+      return outputs.push({
+        cell_output: {
+          capacity: nftCell.cell_output.capacity,
+          lock: parseAddress(toAddress),
+          type: nftCell.cell_output.type,
+        },
+        data: nftCell.data,
+        out_point: undefined,
+        block_hash: undefined,
+      });
+    });
+  // For extra safety, let's add fixedEntries for the input and output NFT cells.
+  skeleton = skeleton.update("fixedEntries", (fixedEntries) => {
+    return fixedEntries.push(
+      {
+        field: "inputs",
+        index: 0,
+      },
+      {
+        field: "outputs",
+        index: 0,
+      }
+    );
+  });
+  // Since we are using the NFT script, we need to include NFT cell dep.
+  skeleton = skeleton.update("cellDeps", (cellDeps) => {
+    return cellDeps.push(buildNftCellDep());
+  });
+  // For simplicity, token sender would pay for transaction fee.
+  skeleton = await common.payFee(
+    skeleton,
+    [generateAddress(nftCell.cell_output.lock)],
+    FEE
+  );
+  // Finally, let's generate messages that are required in transaction signing phase:
+  skeleton = common.prepareSigningEntries(skeleton, { config: CONFIG });
+  return skeleton;
 }
