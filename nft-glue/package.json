@@ -1,0 +1,9 @@
+{
+  "name": "nft-glue",
+  "version": "0.1.0",
+  "description": "Glue code for interacting with NFT in CKB",
+  "main": "lib/index.js",
+  "repository": "https://github.com/nervosnetwork/dapps-on-ckb-workshop-code",
+  "author": "Nervos Network",
+  "license": "MIT"
+}
