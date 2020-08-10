@@ -99,6 +99,27 @@ export async function generateNftToken(
       block_hash: undefined,
     });
   });
+  // Here we need some bookkeeping efforts: by default, lumos is designed to generate
+  // smaller transactions. Meaning the following cases might happen:
+  //
+  // 1. Multiple output cells with the same owner might be merged together;
+  // 2. Transferring to an address which has input cells in the transaction, might
+  // result in the input cell being removed to cancel the transfer operation.
+  //
+  // While for a normal workflow, those optimizations help us achieve smaller
+  // transactions, they might get in the way, since NFT requires special output cell,
+  // as well as stable input cell(since the first input cell is used to calculate
+  // NFT ID). We do have thought about this case, `fixedEntries` in TransactionSkeleton
+  // can be used to mark certain fields as fixed, meaning no further optimizations should
+  // alter those components.
+  skeleton = skeleton.update("fixedEntries", (fixedEntries) => {
+    return fixedEntries.push(
+      {
+        field: "outputs",
+        index: 0,
+      }
+    );
+  });
   // Now let's inject input cells to the transaction so as to provide capacities
   // needed by the newly created input cells.
   skeleton = await common.injectCapacity(skeleton, 0, [fromAddress]);
@@ -121,27 +142,11 @@ export async function generateNftToken(
       return output;
     });
   });
-  // Here we need some bookkeeping efforts: by default, lumos is designed to generate
-  // smaller transactions. Meaning the following cases might happen:
-  //
-  // 1. Multiple output cells with the same owner might be merged together;
-  // 2. Transferring to an address which has input cells in the transaction, might
-  // result in the input cell being removed to cancel the transfer operation.
-  //
-  // While for a normal workflow, those optimizations help us achieve smaller
-  // transactions, they might get in the way, since NFT requires special output cell,
-  // as well as stable input cell(since the first input cell is used to calculate
-  // NFT ID). We do have thought about this case, `fixedEntries` in TransactionSkeleton
-  // can be used to mark certain fields as fixed, meaning no further optimizations should
-  // alter those components.
+  // The first input must be fixed as well, since it is used to generate NFT ID
   skeleton = skeleton.update("fixedEntries", (fixedEntries) => {
     return fixedEntries.push(
       {
         field: "inputs",
-        index: 0,
-      },
-      {
-        field: "outputs",
         index: 0,
       }
     );
