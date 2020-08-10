@@ -37,6 +37,8 @@ export const CONFIG = getConfig();
 export const INDEXER = new Indexer(CKB_RPC, "./lumos-indexed-data");
 INDEXER.startForever();
 
+export * as ADDRESS from "./addresses";
+
 function buildNftTypeScript(governanceLock: Script): Script {
   const hasher = new CKBHasher();
   hasher.update(
