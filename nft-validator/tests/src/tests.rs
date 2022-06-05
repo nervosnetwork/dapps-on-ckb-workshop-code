@@ -18,8 +18,8 @@ fn test_nft_transfer() {
     // deploy contract
     let mut context = Context::default();
     let nft_bin: Bytes = Loader::default().load_binary("nft-validator");
-    let nft_out_point = context.deploy_contract(nft_bin);
-    let always_success_out_point = context.deploy_contract(ALWAYS_SUCCESS.clone());
+    let nft_out_point = context.deploy_cell(nft_bin);
+    let always_success_out_point = context.deploy_cell(ALWAYS_SUCCESS.clone());
 
     // prepare scripts
     let lock_script = context
@@ -93,8 +93,8 @@ fn test_nft_generation() {
     // deploy contract
     let mut context = Context::default();
     let nft_bin: Bytes = Loader::default().load_binary("nft-validator");
-    let nft_out_point = context.deploy_contract(nft_bin);
-    let always_success_out_point = context.deploy_contract(ALWAYS_SUCCESS.clone());
+    let nft_out_point = context.deploy_cell(nft_bin);
+    let always_success_out_point = context.deploy_cell(ALWAYS_SUCCESS.clone());
 
     // prepare scripts
     let lock_script = context
@@ -175,8 +175,8 @@ fn test_nft_invalid_governance() {
     // deploy contract
     let mut context = Context::default();
     let nft_bin: Bytes = Loader::default().load_binary("nft-validator");
-    let nft_out_point = context.deploy_contract(nft_bin);
-    let always_success_out_point = context.deploy_contract(ALWAYS_SUCCESS.clone());
+    let nft_out_point = context.deploy_cell(nft_bin);
+    let always_success_out_point = context.deploy_cell(ALWAYS_SUCCESS.clone());
 
     // prepare scripts
     let lock_script = context
@@ -251,8 +251,8 @@ fn test_nft_invalid_nft_data() {
     // deploy contract
     let mut context = Context::default();
     let nft_bin: Bytes = Loader::default().load_binary("nft-validator");
-    let nft_out_point = context.deploy_contract(nft_bin);
-    let always_success_out_point = context.deploy_contract(ALWAYS_SUCCESS.clone());
+    let nft_out_point = context.deploy_cell(nft_bin);
+    let always_success_out_point = context.deploy_cell(ALWAYS_SUCCESS.clone());
 
     // prepare scripts
     let lock_script = context
@@ -331,8 +331,8 @@ fn test_nft_invalid_nft_hash() {
     // deploy contract
     let mut context = Context::default();
     let nft_bin: Bytes = Loader::default().load_binary("nft-validator");
-    let nft_out_point = context.deploy_contract(nft_bin);
-    let always_success_out_point = context.deploy_contract(ALWAYS_SUCCESS.clone());
+    let nft_out_point = context.deploy_cell(nft_bin);
+    let always_success_out_point = context.deploy_cell(ALWAYS_SUCCESS.clone());
 
     // prepare scripts
     let lock_script = context
