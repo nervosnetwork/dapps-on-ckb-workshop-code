@@ -7,6 +7,5 @@ edition = "2018"
 
 [dependencies]
 blake2b-ref = "0.3.0"
-ckb-tool = "0.3"
-ckb-testtool = "0.3"
+ckb-testtool = "0.7"
 rand = "0.7.3"

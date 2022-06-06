@@ -1,14 +1,33 @@
 use super::*;
 use blake2b_ref::Blake2bBuilder;
-use ckb_testtool::{builtin::ALWAYS_SUCCESS, context::Context};
-use ckb_tool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
+use ckb_testtool::{
+    builtin::ALWAYS_SUCCESS, context::Context,
+    ckb_error::assert_error_eq,
+    ckb_script::ScriptError,
+    ckb_types::{
+        bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*
+    },
+};
 use rand::{thread_rng, Rng};
+use std::fmt::Write;
 
 pub fn random_32bytes() -> Bytes {
     let mut rng = thread_rng();
     let mut buf = vec![0u8; 32];
     rng.fill(&mut buf[..]);
     Bytes::from(buf)
+}
+
+pub fn encode_hex(bytes: &[u8]) -> String {
+    let mut s = String::with_capacity(bytes.len() * 2);
+    for &b in bytes {
+        write!(&mut s, "{:02x}", b).unwrap();
+    }
+    s
+}
+
+pub fn get_cell_data_hash(cell: CellOutput) -> String {
+    return encode_hex(cell.type_().to_opt().unwrap().code_hash().as_slice());
 }
 
 const MAX_CYCLES: u64 = 10_000_000;
@@ -241,9 +260,11 @@ fn test_nft_invalid_governance() {
         .build();
     let tx = context.complete_tx(tx);
 
+    let code_hash = get_cell_data_hash(tx.output(1).unwrap());
+
     // run
     let error = context.verify_tx(&tx, MAX_CYCLES).unwrap_err();
-    assert_eq!("Script(ValidationFailure(6))", error.to_string());
+    assert_error_eq!(error, ScriptError::ValidationFailure("by-data-hash/".to_string() + &code_hash, 6).output_type_script(1));
 }
 
 #[test]
@@ -321,9 +342,11 @@ fn test_nft_invalid_nft_data() {
         .build();
     let tx = context.complete_tx(tx);
 
+    let code_hash = get_cell_data_hash(tx.output(1).unwrap());
+
     // run
     let error = context.verify_tx(&tx, MAX_CYCLES).unwrap_err();
-    assert_eq!("Script(ValidationFailure(4))", error.to_string());
+    assert_error_eq!(error, ScriptError::ValidationFailure("by-data-hash/".to_string() + &code_hash, 4).output_type_script(1));
 }
 
 #[test]
@@ -402,7 +425,9 @@ fn test_nft_invalid_nft_hash() {
         .build();
     let tx = context.complete_tx(tx);
 
+    let code_hash = get_cell_data_hash(tx.output(1).unwrap());
+
     // run
     let error = context.verify_tx(&tx, MAX_CYCLES).unwrap_err();
-    assert_eq!("Script(ValidationFailure(7))", error.to_string());
+    assert_error_eq!(error, ScriptError::ValidationFailure("by-data-hash/".to_string() + &code_hash, 7).output_type_script(1));
 }
