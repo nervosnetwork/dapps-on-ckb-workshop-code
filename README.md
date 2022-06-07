@@ -15,7 +15,7 @@ In this workshop, we are building an [NFT](https://talk.nervos.org/t/rfc-ckb-nft
 
 ## Build and run that workshop code
 
-1. Config and run ckb test net
+## Config and run ckb test net
  1. config genesis.issued_cells
 - `ckb init --chain devnet` create ckb config file
 - `echo d00c06bfd800d27397002dca6fb0993d5ba6399b4238b2f29ee9deb97593d2bc > alice`
@@ -57,7 +57,7 @@ lock.hash_type = "type"
   3. Run ckb
  - `ckb run `
 
-2. Build and deploy contracts
+## Build and deploy contracts
  - `cd nft-validator`
     1. Test contracts correct
  - `capsule build`
@@ -67,7 +67,7 @@ lock.hash_type = "type"
  - `capsule build —address ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37` // save deploy tx_hash
  - `ckb-cli get_transaction —hash <get txhash from previous step ↑>` get and save cell info
 
-3. test contract with node 
+## test contract with node 
     1. config
  - `cd ./nft-glue`
  - add NFT scripts to config.json
