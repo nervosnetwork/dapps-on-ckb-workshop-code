@@ -1,8 +1,7 @@
 import { env } from "process";
 
 import { ecdsaSign } from "secp256k1";
-import { Reader, RPC, normalizers } from "ckb-js-toolkit";
-import { commons, Indexer } from "@ckb-lumos/lumos";
+import { commons, Indexer, RPC, toolkit } from "@ckb-lumos/lumos";
 import {
   HexString,
   Hash,
@@ -24,6 +23,7 @@ import {
 } from "@ckb-lumos/helpers";
 
 const CKB_RPC = "http://127.0.0.1:8114";
+const CKB_INDEXER_URL = "http://127.0.0.1:8116";
 
 // For simplicity, we hardcode 0.1 CKB as transaction fee here.
 const FEE = BigInt(10000000);
@@ -32,7 +32,8 @@ env.LUMOS_CONFIG_FILE = env.LUMOS_CONFIG_FILE || "./config.json";
 initializeConfig();
 
 export const CONFIG = getConfig();
-export const INDEXER = new Indexer(CKB_RPC, "./lumos-indexed-data");
+export const INDEXER = new Indexer(CKB_INDEXER_URL, CKB_RPC);
+export const rpc = new RPC(CKB_RPC);
 INDEXER.startForever();
 
 export * as ADDRESS from "./addresses";
@@ -40,7 +41,7 @@ export * as ADDRESS from "./addresses";
 function buildNftTypeScript(governanceLock: Script): Script {
   const hasher = new CKBHasher();
   hasher.update(
-    core.SerializeScript(normalizers.NormalizeScript(governanceLock))
+    core.SerializeScript(toolkit.normalizers.NormalizeScript(governanceLock))
   );
   const hash = hasher.digestHex();
   const NFT = CONFIG.SCRIPTS.NFT;
@@ -130,7 +131,7 @@ export async function generateNftToken(
   let inputCell = skeleton.get("inputs")!.get(0)!;
   hasher.update(
     core.SerializeCellInput(
-      normalizers.NormalizeCellInput({
+      toolkit.normalizers.NormalizeCellInput({
         previous_output: inputCell.out_point,
         since: "0x0",
       })
@@ -176,17 +177,17 @@ export async function signAndSendTransactionSkeleton(
     .get("signingEntries")
     .map(({ message }) => {
       const o = ecdsaSign(
-        new Uint8Array(new Reader(message).toArrayBuffer()),
-        new Uint8Array(new Reader(privateKey).toArrayBuffer())
+        new Uint8Array(new toolkit.Reader(message).toArrayBuffer()),
+        new Uint8Array(new toolkit.Reader(privateKey).toArrayBuffer())
       );
       const signature = new Uint8Array(65);
       signature.set(o.signature, 0);
       signature.set([o.recid], 64);
-      return new Reader(signature.buffer).serializeJson();
+      return new toolkit.Reader(signature.buffer).serializeJson();
     })
     .toArray();
   const tx = sealTransaction(skeleton, signatures);
-  const rpc = new RPC(CKB_RPC);
+  console.log(JSON.stringify(tx))
   const hash = await rpc.send_transaction(tx);
   return hash;
 }

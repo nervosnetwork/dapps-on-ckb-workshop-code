@@ -3,3 +3,4 @@ target/
 .cache/.cargo/*
 !.gitkeep
 .tmp/
+migrations/
