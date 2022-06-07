@@ -18,7 +18,6 @@
     "@ckb-lumos/common-scripts": "^0.17.0",
     "@ckb-lumos/config-manager": "^0.17.0",
     "@ckb-lumos/helpers": "^0.17.0",
-    "ckb-js-toolkit": "^0.9.1",
     "secp256k1": "^4.0.2"
   },
   "scripts": {
