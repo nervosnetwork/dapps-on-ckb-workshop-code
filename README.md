@@ -81,24 +81,49 @@ Build and deploy contracts
 ```
 $ capsule build —release
 
-$ capsule deploy —address ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37
+$ capsule deploy —address ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37 --fee 0.01
 
 # get and save cell info
-$ ckb-cli get_transaction —hash <get tx_hash from previous step ↑>` 
+$ ckb-cli rpc get_transaction —hash <get tx_hash from previous step ↑>` 
 ```
 
 ## test contract with node 
 
+## test contract with node 
+
+
+```
+# Modify the TX_HASH field of SCRIPTS.SECP256K1_BLAKE160 in config.json file to the current configuration on the dev chain.
+
+# Get the current configuration on the chain
+$ ckb-cli rpc get_block_by_number —number 0
+# Find the cell_deps.hash field from the returned value
+```
+
+
 edit nft-glue/config.json
 ``` json
-"NFT": {
-   "CODE_HASH": "<get from ckb-cli get_transaction step>",
-   "HASH_TYPE": "data",
-   "TX_HASH": "<get from capsule deploy step>",
-   "INDEX": "0x0",
-   "DEP_TYPE": "code"
-}
+{
+  …
+  "SCRIPTS": {
+    "SECP256K1_BLAKE160": {
+      …
+      "TX_HASH": "<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
+    },
+    "SECP256K1_BLAKE160_MULTISIG": {
+      …
+      "TX_HASH": ""<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
+    },
+    "NFT": {
+      "CODE_HASH": "<data_hash from ./nft-validator/migrations/dev/{timestamp}.json>",
+      "HASH_TYPE": "data",
+      "TX_HASH": "<tx_hash from ./nft-validator/migrations/dev/{timestamp}.json>",
+      "INDEX": "0x0",
+      "DEP_TYPE": "code"
+    }
+  }
 ```
+
 
 build node project
 ```
