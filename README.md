@@ -89,8 +89,6 @@ $ ckb-cli rpc get_transaction —hash <get tx_hash from previous step ↑>`
 
 ## test contract with node 
 
-## test contract with node 
-
 
 ```
 # Modify the TX_HASH field of SCRIPTS.SECP256K1_BLAKE160 in config.json file to the current configuration on the dev chain.
