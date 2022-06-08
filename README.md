@@ -27,8 +27,8 @@ $ echo 63d86723e08f0f813a36ce6aa123bb2289d90680ae1e99d4de8cdb334553f24d > bob
 $ echo a800c82df5461756ae99b5c6677d019c98cc98c7786b80d7b2e77256e46ea1fe > charlie
 ```
 
-<details>
-<summary>edit dev.toml</summary>
+edit dev.toml
+
 ``` yaml
 # alice
 # issue for random generated private key: d00c06bfd800d27397002dca6fb0993d5ba6399b4238b2f29ee9deb97593d2bc
@@ -57,8 +57,6 @@ lock.code_hash = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3
 lock.args = "0x40dcec2ef1ffc2340ea13ff4dd9671d2f9787e95"
 lock.hash_type = "type"
 ```
-</details>
-
 
 Add account for ckb-cli
 ``` 
@@ -91,8 +89,7 @@ $ ckb-cli get_transaction —hash <get tx_hash from previous step ↑>`
 
 ## test contract with node 
 
-<details>
-<summary>edit nft-glue/config.json</summary>
+edit nft-glue/config.json
 ``` json
 "NFT": {
    "CODE_HASH": "<get from ckb-cli get_transaction step>",
@@ -102,7 +99,6 @@ $ ckb-cli get_transaction —hash <get tx_hash from previous step ↑>`
    "DEP_TYPE": "code"
 }
 ```
-</details>
 
 build node project
 ```
