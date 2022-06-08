@@ -102,23 +102,24 @@ $ ckb-cli rpc get_block_by_number —number 0
 edit nft-glue/config.json
 ``` json
 {
-  "SCRIPTS": {
-    "SECP256K1_BLAKE160": {
-      "TX_HASH": "<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
-      "<other fields>": "<...>"
-    },
-    "SECP256K1_BLAKE160_MULTISIG": {
-      "TX_HASH": "<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
-      "<other fields>": "<...>"
-    },
-    "NFT": {
-      "CODE_HASH": "<data_hash from ./nft-validator/migrations/dev/{timestamp}.json>",
-      "HASH_TYPE": "data",
-      "TX_HASH": "<tx_hash from ./nft-validator/migrations/dev/{timestamp}.json>",
-      "INDEX": "0x0",
-      "DEP_TYPE": "code"
-    }
-  }
+   "SCRIPTS": {
+      "SECP256K1_BLAKE160": {
+         "TX_HASH": "<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
+         "<other fields>": "<...>"
+      },
+      "SECP256K1_BLAKE160_MULTISIG": {
+         "TX_HASH": "<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
+         "<other fields>": "<...>"
+      },
+      "NFT": {
+         "CODE_HASH": "<data_hash from ./nft-validator/migrations/dev/{timestamp}.json>",
+         "HASH_TYPE": "data",
+         "TX_HASH": "<tx_hash from ./nft-validator/migrations/dev/{timestamp}.json>",
+         "INDEX": "0x0",
+         "DEP_TYPE": "code"
+      }
+   }
+}
 ```
 
 
