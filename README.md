@@ -105,11 +105,11 @@ edit nft-glue/config.json
   "SCRIPTS": {
     "SECP256K1_BLAKE160": {
       "TX_HASH": "<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
-      "other fields": "..."
+      "<other fields>": "<...>"
     },
     "SECP256K1_BLAKE160_MULTISIG": {
       "TX_HASH": "<tx_hash from ckb-cli rpc get_block_by_number —number 0>",
-      "other fields": "..."
+      "<other fields>": "<...>"
     },
     "NFT": {
       "CODE_HASH": "<data_hash from ./nft-validator/migrations/dev/{timestamp}.json>",
