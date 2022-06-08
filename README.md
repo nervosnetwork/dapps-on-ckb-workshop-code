@@ -95,7 +95,7 @@ $ ckb-cli rpc get_transaction —hash <get tx_hash from previous step ↑>`
 
 # Get the current configuration on the chain
 $ ckb-cli rpc get_block_by_number —number 0
-# Find the cell_deps.hash field from the returned value
+# Find the transactions[1].hash field from the returned value
 ```
 
 
