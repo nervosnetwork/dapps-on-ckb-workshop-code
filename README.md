@@ -22,39 +22,39 @@ In this workshop, we are building an [NFT](https://talk.nervos.org/t/rfc-ckb-nft
 $ ckb init --chain devnet
 
 # create account file 
-$ echo d00c06bfd800d27397002dca6fb0993d5ba6399b4238b2f29ee9deb97593d2bc > alice
-$ echo 63d86723e08f0f813a36ce6aa123bb2289d90680ae1e99d4de8cdb334553f24d > bob
-$ echo a800c82df5461756ae99b5c6677d019c98cc98c7786b80d7b2e77256e46ea1fe > charlie
+$ echo 0xfd686a48908e8caf97723578bf85f746e1e1d8956cb132f6a2e92e7234a2a245 > alice
+$ echo 0x5368b818f59570b5bc078a6a564f098a191dcb8938d95c413be5065fd6c42d32 > bob
+$ echo 0xd6013cd867d286ef84cc300ac6546013837df2b06c9f53c83b4c33c2417f6a07 > charlie
 ```
 
 edit dev.toml
 
 ``` yaml
 # alice
-# issue for random generated private key: d00c06bfd800d27397002dca6fb0993d5ba6399b4238b2f29ee9deb97593d2bc
-# address: ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37
+# issue for random generated private key:0xfd686a48908e8caf97723578bf85f746e1e1d8956cb132f6a2e92e7234a2a245
+# address: ckt1qyqw8yx5hx6vwcm7eqren0d0v39wvfwdhy3q2807pp
 [[genesis.issued_cells]]
 capacity = 20_000_000_000_00000000
 lock.code_hash = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8"
-lock.args = "0xc8328aabcd9b9e8e64fbc566c4385c3bdeb219d7"
+lock.args = "0xe390d4b9b4c7637ec80799bdaf644ae625cdb922"
 lock.hash_type = "type"
 
 # bob
-# issue for random generated private key: 63d86723e08f0f813a36ce6aa123bb2289d90680ae1e99d4de8cdb334553f24d
-# address: ckt1qyqywrwdchjyqeysjegpzw38fvandtktdhrs0zaxl4
+# issue for random generated private key:0x5368b818f59570b5bc078a6a564f098a191dcb8938d95c413be5065fd6c42d32
+# address: ckt1qyqtdhd6s7a44a0s2wc6uk7tcl6duq68nalqvzxw09
 [[genesis.issued_cells]]
 capacity = 20_000_000_000_00000000
 lock.code_hash = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8"
-lock.args = "0x470dcdc5e44064909650113a274b3b36aecb6dc7"
+lock.args = "0xb6ddba87bb5af5f053b1ae5bcbc7f4de03479f7e"
 lock.hash_type = "type"
 
 # charlie
-# issue for random generated private key: a800c82df5461756ae99b5c6677d019c98cc98c7786b80d7b2e77256e46ea1fe
-# address: ckt1qyqyph8v9mclls35p6snlaxajeca97tc062sa5gahk
+# issue for random generated private key:0xd6013cd867d286ef84cc300ac6546013837df2b06c9f53c83b4c33c2417f6a07
+# address: ckt1qyqxek9w28u3htxhjyqjd7yqzw9nptzaxq2shqlft0
 [[genesis.issued_cells]]
 capacity = 20_000_000_000_00000000
 lock.code_hash = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8"
-lock.args = "0x40dcec2ef1ffc2340ea13ff4dd9671d2f9787e95"
+lock.args = "0x6cd8ae51f91bacd7910126f880138b30ac5d3015"
 lock.hash_type = "type"
 ```
 
@@ -81,7 +81,7 @@ Build and deploy contracts
 ```
 $ capsule build —release
 
-$ capsule deploy —address ckt1qyqvsv5240xeh85wvnau2eky8pwrhh4jr8ts8vyj37 --fee 0.01
+$ capsule deploy —address ckt1qyqw8yx5hx6vwcm7eqren0d0v39wvfwdhy3q2807pp --fee 0.01
 
 # get and save cell info
 $ ckb-cli rpc get_transaction —hash <get tx_hash from previous step ↑>` 
