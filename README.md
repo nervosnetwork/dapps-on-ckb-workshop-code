@@ -79,12 +79,12 @@ $ capsule test
 
 Build and deploy contracts
 ```
-$ capsule build —-release
+$ capsule build --release
 
-$ capsule deploy —-address ckt1qyqw8yx5hx6vwcm7eqren0d0v39wvfwdhy3q2807pp --fee 0.01
+$ capsule deploy --address ckt1qyqw8yx5hx6vwcm7eqren0d0v39wvfwdhy3q2807pp --fee 0.01
 
 # get and save cell info
-$ ckb-cli rpc get_transaction —-hash <get tx_hash from previous step ↑>` 
+$ ckb-cli rpc get_transaction --hash <get tx_hash from previous step ↑>` 
 ```
 
 ## test contract with node 
@@ -94,7 +94,7 @@ $ ckb-cli rpc get_transaction —-hash <get tx_hash from previous step ↑>`
 # Modify the TX_HASH field of SCRIPTS.SECP256K1_BLAKE160 in config.json file to the current configuration on the dev chain.
 
 # Get the current configuration on the chain
-$ ckb-cli rpc get_block_by_number -—number 0
+$ ckb-cli rpc get_block_by_number --number 0
 # Find the transactions[1].hash field from the returned value
 ```
 
