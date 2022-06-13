@@ -1,31 +1,29 @@
 import { env } from "process";
 
 import { ecdsaSign } from "secp256k1";
-import { Reader, RPC, normalizers } from "ckb-js-toolkit";
+import { commons, Indexer, RPC, toolkit } from "@ckb-lumos/lumos";
 import {
   HexString,
   Hash,
   Address,
   Cell,
   CellDep,
-  OutPoint,
   Script,
   core,
   utils,
 } from "@ckb-lumos/base";
 const { CKBHasher } = utils;
-import { common } from "@ckb-lumos/common-scripts";
 import { getConfig, initializeConfig } from "@ckb-lumos/config-manager";
 import {
   parseAddress,
-  generateAddress,
   sealTransaction,
   TransactionSkeletonType,
   TransactionSkeleton,
+  encodeToAddress,
 } from "@ckb-lumos/helpers";
-import { Indexer } from "@ckb-lumos/indexer";
 
 const CKB_RPC = "http://127.0.0.1:8114";
+const CKB_INDEXER_URL = "http://127.0.0.1:8116";
 
 // For simplicity, we hardcode 0.1 CKB as transaction fee here.
 const FEE = BigInt(10000000);
@@ -34,7 +32,8 @@ env.LUMOS_CONFIG_FILE = env.LUMOS_CONFIG_FILE || "./config.json";
 initializeConfig();
 
 export const CONFIG = getConfig();
-export const INDEXER = new Indexer(CKB_RPC, "./lumos-indexed-data");
+export const INDEXER = new Indexer(CKB_INDEXER_URL, CKB_RPC);
+export const rpc = new RPC(CKB_RPC);
 INDEXER.startForever();
 
 export * as ADDRESS from "./addresses";
@@ -42,7 +41,7 @@ export * as ADDRESS from "./addresses";
 function buildNftTypeScript(governanceLock: Script): Script {
   const hasher = new CKBHasher();
   hasher.update(
-    core.SerializeScript(normalizers.NormalizeScript(governanceLock))
+    core.SerializeScript(toolkit.normalizers.NormalizeScript(governanceLock))
   );
   const hash = hasher.digestHex();
   const NFT = CONFIG.SCRIPTS.NFT;
@@ -115,22 +114,24 @@ export async function generateNftToken(
   // can be used to mark certain fields as fixed, meaning no further optimizations should
   // alter those components.
   skeleton = skeleton.update("fixedEntries", (fixedEntries) => {
-    return fixedEntries.push(
-      {
-        field: "outputs",
-        index: 0,
-      }
-    );
+    return fixedEntries.push({
+      field: "outputs",
+      index: 0,
+    });
   });
   // Now let's inject input cells to the transaction so as to provide capacities
   // needed by the newly created input cells.
-  skeleton = await common.injectCapacity(skeleton, 0, [fromAddress]);
+  skeleton = await commons.secp256k1Blake160.injectCapacity(
+    skeleton,
+    0,
+    fromAddress
+  );
   // Now we can generate and fill in the correct NFT token ID.
   const hasher = new CKBHasher();
   let inputCell = skeleton.get("inputs")!.get(0)!;
   hasher.update(
     core.SerializeCellInput(
-      normalizers.NormalizeCellInput({
+      toolkit.normalizers.NormalizeCellInput({
         previous_output: inputCell.out_point,
         since: "0x0",
       })
@@ -146,21 +147,21 @@ export async function generateNftToken(
   });
   // The first input must be fixed as well, since it is used to generate NFT ID
   skeleton = skeleton.update("fixedEntries", (fixedEntries) => {
-    return fixedEntries.push(
-      {
-        field: "inputs",
-        index: 0,
-      }
-    );
+    return fixedEntries.push({
+      field: "inputs",
+      index: 0,
+    });
   });
   // Since we are using the NFT script, we need to include NFT cell dep.
   skeleton = skeleton.update("cellDeps", (cellDeps) => {
     return cellDeps.push(buildNftCellDep());
   });
   // Similar to injectCapacity, lumos also provides helper methods to inject fee:
-  skeleton = await common.payFee(skeleton, [fromAddress], FEE);
+  skeleton = await commons.secp256k1Blake160.payFee(skeleton, fromAddress, FEE);
   // Finally, let's generate messages that are required in transaction signing phase:
-  skeleton = common.prepareSigningEntries(skeleton, { config: CONFIG });
+  skeleton = commons.secp256k1Blake160.prepareSigningEntries(skeleton, {
+    config: CONFIG,
+  });
   return skeleton;
 }
 
@@ -176,17 +177,17 @@ export async function signAndSendTransactionSkeleton(
     .get("signingEntries")
     .map(({ message }) => {
       const o = ecdsaSign(
-        new Uint8Array(new Reader(message).toArrayBuffer()),
-        new Uint8Array(new Reader(privateKey).toArrayBuffer())
+        new Uint8Array(new toolkit.Reader(message).toArrayBuffer()),
+        new Uint8Array(new toolkit.Reader(privateKey).toArrayBuffer())
       );
       const signature = new Uint8Array(65);
       signature.set(o.signature, 0);
       signature.set([o.recid], 64);
-      return new Reader(signature.buffer).serializeJson();
+      return new toolkit.Reader(signature.buffer).serializeJson();
     })
     .toArray();
   const tx = sealTransaction(skeleton, signatures);
-  const rpc = new RPC(CKB_RPC);
+  console.log(JSON.stringify(tx))
   const hash = await rpc.send_transaction(tx);
   return hash;
 }
@@ -253,12 +254,14 @@ export async function transferNftToken(
     return cellDeps.push(buildNftCellDep());
   });
   // For simplicity, token sender would pay for transaction fee.
-  skeleton = await common.payFee(
+  skeleton = await commons.secp256k1Blake160.payFee(
     skeleton,
-    [generateAddress(nftCell.cell_output.lock)],
+    encodeToAddress(nftCell.cell_output.lock),
     FEE
   );
   // Finally, let's generate messages that are required in transaction signing phase:
-  skeleton = common.prepareSigningEntries(skeleton, { config: CONFIG });
+  skeleton = commons.secp256k1Blake160.prepareSigningEntries(skeleton, {
+    config: CONFIG,
+  });
   return skeleton;
 }

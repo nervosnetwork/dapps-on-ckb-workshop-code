@@ -13,12 +13,11 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "@ckb-lumos/base": "^0.6.0",
-    "@ckb-lumos/common-scripts": "^0.6.0",
-    "@ckb-lumos/config-manager": "^0.6.0",
-    "@ckb-lumos/helpers": "^0.6.0",
-    "@ckb-lumos/indexer": "^0.6.0",
-    "ckb-js-toolkit": "^0.9.1",
+    "@ckb-lumos/lumos": "^0.17.0",
+    "@ckb-lumos/base": "^0.17.0",
+    "@ckb-lumos/common-scripts": "^0.17.0",
+    "@ckb-lumos/config-manager": "^0.17.0",
+    "@ckb-lumos/helpers": "^0.17.0",
     "secp256k1": "^4.0.2"
   },
   "scripts": {
