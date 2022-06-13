@@ -13,9 +13,9 @@ In this workshop, we are building an [NFT](https://talk.nervos.org/t/rfc-ckb-nft
 * [nft-validator](/nft-validator): Rust based on-chain validator script for supporting NFT tokens on CKB. [Capsule](https://github.com/nervosnetwork/capsule) is leveraged to simplify script development.
 
 
-# Build and run workshop code
+# Build & Run Workshop
 
-## run ckb dev net
+## Start CKB Devnet
 
 ```
 # create ckb config file
@@ -27,8 +27,10 @@ $ echo 0x5368b818f59570b5bc078a6a564f098a191dcb8938d95c413be5065fd6c42d32 > bob
 $ echo 0xd6013cd867d286ef84cc300ac6546013837df2b06c9f53c83b4c33c2417f6a07 > charlie
 ```
 
-edit dev.toml
+### Edit `dev.toml`
 
+<details>
+   <summary>dev.toml</summary>
 ``` yaml
 # alice
 # issue for random generated private key:0xfd686a48908e8caf97723578bf85f746e1e1d8956cb132f6a2e92e7234a2a245
@@ -57,27 +59,28 @@ lock.code_hash = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3
 lock.args = "0x6cd8ae51f91bacd7910126f880138b30ac5d3015"
 lock.hash_type = "type"
 ```
+</details>
 
-Add account for ckb-cli
+### Importing Account to ckb-cli
 ``` 
 $ ckb-cli account import --privkey-path alice
 $ ckb-cli account import --privkey-path bob
 $ ckb-cli account import --privkey-path charlie
 ```
 
-Run ckb
+### Start CKB & CKB-Indexer
 ```
 $ ckb run
 ```
 
-test contracts
+### Building & Testing Contracts
 ``` 
 $ cd nft-validator
 $ capsule build
 $ capsule test
 ```
 
-Build and deploy contracts
+### Deploy Contracts to Devnet
 ```
 $ capsule build --release
 
@@ -87,7 +90,7 @@ $ capsule deploy --address ckt1qyqw8yx5hx6vwcm7eqren0d0v39wvfwdhy3q2807pp --fee 
 $ ckb-cli rpc get_transaction --hash <get tx_hash from previous step ↑>` 
 ```
 
-## test contract with node 
+## Interacting with Contract via Lumos 
 
 
 ```
@@ -99,7 +102,7 @@ $ ckb-cli rpc get_block_by_number --number 0
 ```
 
 
-edit nft-glue/config.json
+### Creating the Config
 ``` json
 {
    "SCRIPTS": {
