@@ -31,7 +31,8 @@ $ echo 0xd6013cd867d286ef84cc300ac6546013837df2b06c9f53c83b4c33c2417f6a07 > char
 
 <details>
    <summary>dev.toml</summary>
-``` yaml
+
+``` python
 # alice
 # issue for random generated private key:0xfd686a48908e8caf97723578bf85f746e1e1d8956cb132f6a2e92e7234a2a245
 # address: ckt1qyqw8yx5hx6vwcm7eqren0d0v39wvfwdhy3q2807pp
@@ -59,6 +60,7 @@ lock.code_hash = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3
 lock.args = "0x6cd8ae51f91bacd7910126f880138b30ac5d3015"
 lock.hash_type = "type"
 ```
+
 </details>
 
 ### Importing Account to ckb-cli
